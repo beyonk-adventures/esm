@@ -65,9 +65,8 @@ describe("scenario tests", function () {
       "-r", "@babel/register",
       path.resolve("fixture/scenario/babel-error/index.js")
     ])
-    .then(assert.fail)
-    .catch(({ stderr }) => {
-      assert.ok(stderr.includes("'importMeta' isn't currently enabled"))
+    .then(assert.fail.bind("Call did not fail"), ({ stderr }) => {
+      assert.match(stderr,/BABEL_PARSE_ERROR/)
     })
   )
 
