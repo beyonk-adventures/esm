@@ -66,11 +66,7 @@ describe("scenario tests", function () {
       path.resolve("fixture/scenario/babel-error/index.js")
     ])
     .then(assert.fail.bind("Call did not fail"), ({ stderr }) => {
-      if (assert.match) {
-        assert.match(stderr,/BABEL_PARSE_ERROR/)
-      } else {
-        assert.ok(stderr.includes("BABEL_PARSE_ERROR"))
-      }
+      assert.ok(stderr.includes("BABEL_ERROR"))
     })
   )
 
