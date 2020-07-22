@@ -1,5 +1,5 @@
 import assert from "assert"
-import require from "./require.js"
+import require2 from "./require.js"
 
 describe("file extension tests", () => {
   it("should not error importing `.mjs` files", () =>
@@ -38,7 +38,7 @@ describe("file extension tests", () => {
   )
 
   it("should not error requiring extensionless files", () => {
-    require("./fixture/ext/no-ext-cjs")
+    require2("./fixture/ext/no-ext-cjs")
   })
 
   it("should error importing files with unknown extensions from ESM", () =>
@@ -66,7 +66,7 @@ describe("file extension tests", () => {
   )
 
   it("should not error requiring unknown extensions", () => {
-    require("./fixture/ext/a.unknown-ext-cjs")
+    require2("./fixture/ext/a.unknown-ext-cjs")
   })
 
   it('should error importing non `.mjs` ES modules from `.mjs` files with `options.mode` of "strict"', () =>

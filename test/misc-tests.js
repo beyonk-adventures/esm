@@ -9,7 +9,7 @@ import fs from "fs-extra"
 import * as fsExtraNs from "fs-extra"
 import * as fsNs from "fs"
 import path from "path"
-import require from "./require.js"
+import require2 from "./require.js"
 import resetState from "./reset-state.js"
 import stream from "stream"
 import trash from "../script/trash.js"
@@ -416,7 +416,7 @@ describe("miscellaneous tests", () => {
   describe("errors", () => {
     it("should error when `require()` receives an empty `request`", () => {
       try {
-        require("")
+        require2("")
         assert.fail()
       } catch ({ code }) {
         assert.strictEqual(code, "ERR_INVALID_ARG_VALUE")
@@ -425,9 +425,9 @@ describe("miscellaneous tests", () => {
 
     it("should error when `require()` methods receive a non-string `request`", () => {
       const funcs = [
-        require,
-        require.resolve,
-        require.resolve.paths
+        require2,
+        require2.resolve,
+        require2.resolve.paths
       ]
 
       for (const func of funcs) {
@@ -591,7 +591,7 @@ describe("miscellaneous tests", () => {
     )
 
     it("should find a file before a package", () => {
-      const actual = require.resolve("./fixture/paths/file")
+      const actual = require2.resolve("./fixture/paths/file")
 
       assert.strictEqual(actual, path.resolve("fixture/paths/file.js"))
     })
@@ -603,14 +603,14 @@ describe("miscellaneous tests", () => {
       ]
 
       for (const request of requests) {
-        const actual = require.resolve(request)
+        const actual = require2.resolve(request)
 
         assert.strictEqual(actual, path.resolve("fixture/paths/file/index.js"))
       }
     })
 
     it("should find a package in the parent directory", () => {
-      const actual = require.resolve("./fixture/paths/file/a/..")
+      const actual = require2.resolve("./fixture/paths/file/a/..")
 
       assert.strictEqual(actual, path.resolve("fixture/paths/file/index.js"))
     })
@@ -642,7 +642,7 @@ describe("miscellaneous tests", () => {
       ]
 
       for (const request of requests) {
-        assert.ok(require(request))
+        assert.ok(require2(request))
       }
     })
 
@@ -683,7 +683,7 @@ describe("miscellaneous tests", () => {
       ]
 
       for (const { id, resolved } of datas) {
-        assert.strictEqual(require.resolve(id), resolved)
+        assert.strictEqual(require2.resolve(id), resolved)
       }
     })
 
@@ -717,7 +717,7 @@ describe("miscellaneous tests", () => {
 
     it('should not resolve non-local "." requests with `require()`', () => {
       try {
-        require(".")
+        require2(".")
         assert.fail()
       } catch (e) {
         checkLegacyErrorProps(e, "MODULE_NOT_FOUND")
@@ -747,7 +747,7 @@ describe("miscellaneous tests", () => {
 
     it("should support `options` in `require.resolve()`", () => {
       const paths = [path.resolve("fixture/paths")]
-      const actual = require.resolve("a", { paths })
+      const actual = require2.resolve("a", { paths })
 
       assert.strictEqual(actual, path.resolve("fixture/paths/node_modules/a/index.js"))
     })
@@ -768,7 +768,7 @@ describe("miscellaneous tests", () => {
         path.resolve("../node_modules")
       ]
 
-      const actual = require.resolve.paths("a").slice(0, 2)
+      const actual = require2.resolve.paths("a").slice(0, 2)
 
       assert.deepStrictEqual(actual, expected)
     })
@@ -790,18 +790,18 @@ describe("miscellaneous tests", () => {
     )
 
     it("should support modified `require.extensions` in CJS", () => {
-      require.extensions[".mjs"] = () => ({})
+      require2.extensions[".mjs"] = () => ({})
 
-      Reflect.deleteProperty(require.cache, abcPath)
+      Reflect.deleteProperty(require2.cache, abcPath)
 
-      assert.doesNotThrow(() => require(abcPath))
+      assert.doesNotThrow(() => require2(abcPath))
 
-      require.extensions[".mjs"] = require.extensions[".js"]
+      require2.extensions[".mjs"] = require2.extensions[".js"]
 
-      Reflect.deleteProperty(require.cache, abcPath)
+      Reflect.deleteProperty(require2.cache, abcPath)
 
       assert.throws(
-        () => require(abcPath),
+        () => require2(abcPath),
         SyntaxError
       )
     })
@@ -809,9 +809,9 @@ describe("miscellaneous tests", () => {
     it("should not support modified `require.extensions` in ESM", () => {
       const filename = path.resolve("../package.json")
 
-      require.extensions[".json"] = () => ({})
+      require2.extensions[".json"] = () => ({})
 
-      Reflect.deleteProperty(require.cache, filename)
+      Reflect.deleteProperty(require2.cache, filename)
 
       return import(filename)
         .then((ns) => assert.deepStrictEqual(ns.default, pkgJSON))
@@ -820,9 +820,9 @@ describe("miscellaneous tests", () => {
     it("should not support new `require.extensions` in ESM", () => {
       const filename = path.resolve("./fixture/cof")
 
-      require.extensions[".coffee"] = require.extensions[".js"]
+      require2.extensions[".coffee"] = require2.extensions[".js"]
 
-      Reflect.deleteProperty(require.cache, filename)
+      Reflect.deleteProperty(require2.cache, filename)
 
       return import(filename)
         .then(assert.fail)
@@ -836,7 +836,7 @@ describe("miscellaneous tests", () => {
 
       const request = ".\\node_modules\\ext-priority\\"
 
-      assert.doesNotThrow(() => require(request))
+      assert.doesNotThrow(() => require2(request))
 
       return import(request)
     })
@@ -1044,7 +1044,7 @@ describe("miscellaneous tests", () => {
     it("should expose ESM in `module.parent` with `options.cjs.cache`", () => {
       const filename = path.resolve("fixture/options-cjs-cache/parent/on/child.js")
 
-      Reflect.deleteProperty(require.cache, filename)
+      Reflect.deleteProperty(require2.cache, filename)
 
       return import("./fixture/options-cjs-cache/parent/on/parent.js")
         .then(({ child, parent }) => {
@@ -1056,7 +1056,7 @@ describe("miscellaneous tests", () => {
     it("should not expose ESM in `module.parent` with `options.cjs.cache` in `.mjs` files", () => {
       const filename = path.resolve("fixture/options-cjs-cache/parent/on/child.js")
 
-      Reflect.deleteProperty(require.cache, filename)
+      Reflect.deleteProperty(require2.cache, filename)
 
       return import("./fixture/options-cjs-cache/parent/on/parent.mjs")
         .then(({ child }) => {
@@ -1068,19 +1068,19 @@ describe("miscellaneous tests", () => {
     it("should not expose ESM in `require.cache`", () => {
       const filename = path.resolve("fixture/options-cjs-cache/require/out/index.js")
 
-      Reflect.deleteProperty(require.cache, filename)
+      Reflect.deleteProperty(require2.cache, filename)
 
       return import(filename)
-        .then(() => assert.strictEqual(Reflect.has(require.cache, filename), false))
+        .then(() => assert.strictEqual(Reflect.has(require2.cache, filename), false))
     })
 
     it("should expose ESM in `require.cache` with `options.cjs.cache`", () => {
       const filename = path.resolve("fixture/options-cjs-cache/require/in/index.js")
 
-      Reflect.deleteProperty(require.cache, filename)
+      Reflect.deleteProperty(require2.cache, filename)
 
       return import(filename)
-        .then(() => assert.strictEqual(Reflect.has(require.cache, filename), true))
+        .then(() => assert.strictEqual(Reflect.has(require2.cache, filename), true))
     })
 
     it("should add `module.exports.__esModule` to ES modules with `options.cjs.esModule`", () =>
@@ -1089,7 +1089,7 @@ describe("miscellaneous tests", () => {
         "./fixture/options-cjs-es-module/interop"
       ]
       .map((request) => {
-        const exported = require(request)
+        const exported = require2(request)
         const descriptor = Reflect.getOwnPropertyDescriptor(exported, "__esModule")
 
         assert.deepStrictEqual(descriptor, {
@@ -1221,7 +1221,7 @@ describe("miscellaneous tests", () => {
     })
 
     it("should support dynamic import in CJS", () =>
-      require("./fixture/import/dynamic.js")
+      require2("./fixture/import/dynamic.js")
         .then((actual) => assert.deepStrictEqual(actual, [abcNs, defNs]))
     )
 
@@ -1298,7 +1298,7 @@ describe("miscellaneous tests", () => {
           "./fixture/eval/indirect/dynamic-import.js"
         ]
         .map((request) =>
-          require(request)
+          require2(request)
             .then((actual) => assert.deepStrictEqual(actual, [abcNs, defNs]))
         ))
     )
@@ -1323,7 +1323,7 @@ describe("miscellaneous tests", () => {
       ]
 
       for (const request of requests) {
-        assert.strictEqual(typeof require(request), "undefined")
+        assert.strictEqual(typeof require2(request), "undefined")
       }
     })
 
@@ -1434,7 +1434,7 @@ describe("miscellaneous tests", () => {
 
     it("should not evaluate already loaded modules from `require()`", () =>
       import("./fixture/load-count.js")
-        .then(() => assert.strictEqual(require("./fixture/load-count.js"), 1))
+        .then(() => assert.strictEqual(require2("./fixture/load-count.js"), 1))
     )
 
     it("should not error importing a non-ambiguous ESM export", () =>
@@ -1608,8 +1608,8 @@ describe("miscellaneous tests", () => {
       .reduce((promise, request) =>
         promise
           .then(() => {
-            Reflect.deleteProperty(require.cache, abcPath)
-            Reflect.deleteProperty(require.cache, defPath)
+            Reflect.deleteProperty(require2.cache, abcPath)
+            Reflect.deleteProperty(require2.cache, defPath)
 
             return import(request)
               .then(assert.fail)
@@ -1872,7 +1872,7 @@ describe("miscellaneous tests", () => {
     })
 
     const Worker = canTestWorker
-      ? require("worker_threads").Worker
+      ? require2("worker_threads").Worker
       : null
 
     const createOnExit = (reject) => {
