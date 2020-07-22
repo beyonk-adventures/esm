@@ -59,10 +59,11 @@ function checkError(error, code) {
 function checkErrorStack(error, startsWith) {
   const stack = error.stack.replace(/\r\n/g, "\n")
 
-  assert.ok(
-    stack.startsWith(startsWith) ||
-    stack.startsWith("SyntaxError:")
-  )
+  assert.match(stack, new RegExp(`^(SyntaxError:|${startsWith.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`))
+  // assert.ok(
+  //   stack.startsWith(startsWith) ||
+  //   stack.startsWith("SyntaxError:")
+  // )
 }
 
 function checkLegacyErrorProps(error, code) {
