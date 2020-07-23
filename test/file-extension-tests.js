@@ -23,8 +23,14 @@ describe("file extension tests", () => {
       ]
       .map((request) =>
         import(request)
-          .then(assert.fail)
-          .catch(({ code }) => assert.strictEqual(code, "ERR_UNKNOWN_FILE_EXTENSION"))
+          .then(
+            () => assert.fail(request + " imported without error, but should have failed"),
+            (e) => {
+              if (e.code === "ERR_ASSERTION") {
+                throw e
+              }
+              assert.strictEqual(e.code, "ERR_UNKNOWN_FILE_EXTENSION")
+            })
       ))
   )
 

@@ -59,6 +59,10 @@ function checkError(error, code) {
 function checkErrorStack(error, startsWith) {
   const stack = error.stack.replace(/\r\n/g, "\n")
 
+  if (error.code === "ERR_ASSERTION") {
+    throw error
+  }
+
   if (assert.match) {
     assert.match(stack, new RegExp(`^(SyntaxError:|${startsWith.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`))
   } else {
@@ -328,8 +332,14 @@ describe("miscellaneous tests", () => {
       .reduce((promise, request) =>
         promise
           .then(() => import(request))
-          .then(assert.fail)
-          .catch((e) => assert.ok(e instanceof SyntaxError))
+          .then(
+            () => assert.fail(request + " imported without error, but should have failed"),
+            (e) => {
+              if (e.code === "ERR_ASSERTION") {
+                throw e
+              }
+              assert.ok(e instanceof SyntaxError)
+            })
       , Promise.resolve())
     )
 
@@ -341,8 +351,14 @@ describe("miscellaneous tests", () => {
       .reduce((promise, request) =>
         promise
           .then(() => import(request))
-          .then(assert.fail)
-          .catch((e) => assert.ok(e instanceof SyntaxError))
+          .then(
+            () => assert.fail(request + " imported without error, but should have failed"),
+            (e) => {
+              if (e.code === "ERR_ASSERTION") {
+                throw e
+              }
+              assert.ok(e instanceof SyntaxError)
+            })
       , Promise.resolve())
     )
 
@@ -356,8 +372,14 @@ describe("miscellaneous tests", () => {
       .reduce((promise, request) =>
         promise
           .then(() => import(request))
-          .then(assert.fail)
-          .catch((e) => assert.ok(e instanceof SyntaxError))
+          .then(
+            () => assert.fail(request + " imported without error, but should have failed"),
+            (e) => {
+              if (e.code === "ERR_ASSERTION") {
+                throw e
+              }
+              assert.ok(e instanceof SyntaxError)
+            })
       , Promise.resolve())
     )
 
@@ -375,8 +397,14 @@ describe("miscellaneous tests", () => {
       .reduce((promise, request) =>
         promise
           .then(() => import(request))
-          .then(assert.fail)
-          .catch((e) => assert.ok(e instanceof SyntaxError))
+          .then(
+            () => assert.fail(request + " imported without error, but should have failed"),
+            (e) => {
+              if (e.code === "ERR_ASSERTION") {
+                throw e
+              }
+              assert.ok(e instanceof SyntaxError)
+            })
       , Promise.resolve())
     )
 
@@ -1723,7 +1751,7 @@ describe("miscellaneous tests", () => {
       const filename = path.resolve("fixture/source/new-target.mjs")
 
       return import(filename)
-        .then(assert.fail)
+        .then(() => assert.fail(filename + " was supposed to fail to import, but it did not."))
         .catch((e) =>
           checkErrorStack(e, [
             getURLFromFilePath(filename) + ":1",
