@@ -1,6 +1,6 @@
 {
   "name": "@beyonk/esm",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "Tomorrow's ECMAScript modules today!",
   "keywords": "commonjs, ecmascript, export, import, modules, node, require",
   "repository": "standard-things/esm",
