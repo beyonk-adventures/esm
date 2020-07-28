@@ -1,5 +1,7 @@
 # esm
 
+** Note: This is a fork of the original ESM with [the PR to update acorn](https://github.com/standard-things/esm/pull/883)**
+
 The brilliantly simple, babel-less, bundle-less ECMAScript module loader.
 
 > `esm` is the world’s most advanced ECMAScript module loader.
